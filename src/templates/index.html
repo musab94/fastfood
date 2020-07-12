@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href='https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css'>
+    <link rel="stylesheet" href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+    <link rel="stylesheet" href="/assests/css/category.css">
+    <style>
+        body {
+            background-color: #eee
+        }
+        .className {
+            -webkit-appearance: menulist-button;
+            height: 50px;
+        }
+    </style>
+
+    <title>Fastorder</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">Fastorder</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse pull-right" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Currency
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {% for currency in currecies %}
+                    <a class="dropdown-item" href="#">{{currency.getCurrencyCode}}</a>
+                    {% endfor %}
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container-fluid mt-5">
+    <div class="row d-flex justify-content-center">
+        <div class="col-md-2">
+            <div class="card">
+                <article class="filter-group">
+                    <h3 style="padding: 10px">Filter</h3>
+                </article>
+                <article class="filter-group">
+                    <header class="card-header"> <a href="#" data-toggle="collapse" data-target="#collapse_aside1" data-abc="true" aria-expanded="false" class="collapsed"> <i class="icon-control fa fa-chevron-down"></i>
+                        <h6 class="title">Categories </h6>
+                    </a> </header>
+                    <div class="filter-content collapse" id="collapse_aside1" style="">
+                        <div class="card-body">
+                            <ul class="list-menu filter">
+                                <li><a href="/" data-filter="0">All</a> </li>
+                                {% for category in categories %}
+                                <li style="text-transform: capitalize;"><a href="/products?category={{category.getId}}{% if getSort %}&sort={{getSort}}{% endif %}" data-filter="{{category.getId}}">{{ category.getCategoryName|e }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-md-10">
+            <div class="p-2 bg-white px-4">
+                <div class="d-flex flex-row justify-content-between">
+                    <div class="d-flex flex-row align-items-center filters">
+                        <h4>Category : </h4><span class="ml-2 cat_print">All</span>
+                    </div>
+                    <div class="d-flex flex-row align-items-center filters">
+                        <div class="d-flex flex-row align-items-center">
+                            <h5 class="mt-1">Sort By Price</h5>
+                            <span class="ml-2">
+                                <select name="sort_price" class="sort-price">
+                                    <option value="">Sort By Price</option>
+                                    <option value="asc" {% if getSort == 'asc' %} selected {% endif %}>Low To Highh</option>
+                                    <option value="desc" {% if getSort == 'desc' %} selected {% endif %}>High To Low</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row prod_boxes">
+                {% for product in products %}
+                <div class="col-md-4 col-lg-4 mt-2" data-cat="{{product.getCatId}}">
+                    <div class="p-4 bg-white">
+                        <div class="d-flex flex-column">
+                            <div><img class="img-fluid img-responsive" style="height: 344px" src="{{product.getImg}}"></div>
+                            <div class="d-flex flex-column">
+                                <div class="d-flex flex-row justify-content-between align-items-center">
+                                    <h5>{{product.getName}}</h5>
+<!--                                    <h6>{{product.getCurrency}} {{product.getPrice}}</h6>-->
+                                </div>
+                                <div><span>{{product.getCurrency}} {{product.getPrice}}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js'></script>
+
+<script>
+    $( document ).ready(function() {
+        var $filterColor = findGetParameter('category');
+        if ($filterColor){
+
+            if ($filterColor == '1'){
+                $('.cat_print').html("T-Shirts");
+            }
+            if ($filterColor == '2'){
+                $('.cat_print').html("Shirts");
+            }
+            if ($filterColor == '3'){
+                $('.cat_print').html("Jeans");
+            }
+        }
+    });
+
+    $( ".sort-price" ).change(function() {
+        var optionSelected = $("option:selected", this);
+        var valueSelected = this.value;
+
+        var url = "/products?{% if getCat %}category={{getCat}}&{% endif %}sort="+valueSelected;
+
+        window.location = url;
+    });
+
+    function findGetParameter(parameterName) {
+        var result = null,
+            tmp = [];
+        var items = location.search.substr(1).split("&");
+        for (var index = 0; index < items.length; index++) {
+            tmp = items[index].split("=");
+            if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+        }
+        return result;
+    }
+</script>
+
+</body>
+</html>
