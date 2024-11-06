@@ -4,7 +4,7 @@
         "slim/php-view": "^2.0",
         "monolog/monolog": "^1.17",
         "robmorgan/phinx": "^0.5.1",
-        "twig/twig": "^2.0"
+        "twig/twig": "^3.11"
     },
     "autoload": {
         "psr-4": {
